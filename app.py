@@ -145,17 +145,18 @@ with st.sidebar:
 
     st.divider()
 
-    # Reset Filters
-    if st.button("Reset Filters", use_container_width=True):
-        st.session_state.aid_input = ""
-        st.session_state.search_text = ""
-        for col in FILTER_COLS:
-            st.session_state[f"filter_{col}"] = []
-        st.rerun()
-
-    # Revert all edits
-    if st.button("Revert All Changes", type="secondary", use_container_width=True):
+    # Single reset button — clears filters and reverts edits
+    if st.button("Reset All", use_container_width=True):
         st.cache_data.clear()
+        # Clear filter widget keys
+        for key in ["aid_input", "search_text"]:
+            if key in st.session_state:
+                del st.session_state[key]
+        for col in FILTER_COLS:
+            k = f"filter_{col}"
+            if k in st.session_state:
+                del st.session_state[k]
+        # Revert data
         st.session_state.df = load_excel().copy()
         st.session_state.edit_count = 0
         st.rerun()
