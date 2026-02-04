@@ -206,7 +206,7 @@ st.markdown("""<style>
         min-width: 260px !important;
     }
     [data-testid="stSidebar"] > div:first-child {
-        padding-top: 0.5rem;
+        padding-top: 2.5rem;
     }
     [data-testid="stSidebar"] [data-testid="stMultiSelect"] {
         margin-bottom: -0.5rem;
