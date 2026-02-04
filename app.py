@@ -116,15 +116,16 @@ def title_case(s: str) -> str:
     return " ".join(result)
 
 
-# ── Handle reset (must happen before widgets render) ─────────────────────────
-if st.session_state.get("_do_reset"):
-    # Preserve only auth state, wipe everything else
-    auth = st.session_state.get("authenticated", False)
+# ── Reset callback ────────────────────────────────────────────────────────────
+def do_reset():
+    """Called by Reset All button callback — runs before next render."""
     st.cache_data.clear()
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-    st.session_state.authenticated = auth
-    st.rerun()
+    st.session_state.aid_input = ""
+    st.session_state.search_text = ""
+    for col in FILTER_COLS:
+        st.session_state[f"filter_{col}"] = []
+    st.session_state.df = load_excel().copy()
+    st.session_state.edit_count = 0
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -155,10 +156,7 @@ with st.sidebar:
 
     st.divider()
 
-    # Reset button — sets flag and reruns so keys are cleared before widgets render
-    if st.button("Reset All", use_container_width=True):
-        st.session_state._do_reset = True
-        st.rerun()
+    st.button("Reset All", use_container_width=True, on_click=do_reset)
 
 
 # ── Parse AID input ──────────────────────────────────────────────────────────
