@@ -205,8 +205,8 @@ st.markdown("""<style>
         width: 260px !important;
         min-width: 260px !important;
     }
-    [data-testid="stSidebar"] .block-container {
-        padding-top: 1rem;
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 0.5rem;
     }
     [data-testid="stSidebar"] [data-testid="stMultiSelect"] {
         margin-bottom: -0.5rem;
@@ -215,7 +215,7 @@ st.markdown("""<style>
     .main .block-container, [data-testid="stSidebar"] {
         font-size: 16px;
     }
-    h1 { font-size: 1.8rem !important; margin-bottom: 0 !important; }
+    h1 { font-size: 1.8rem !important; margin-bottom: -0.5rem !important; }
     h3 { font-size: 1.2rem !important; }
     /* Centre all data-editor columns except Study Goal (2nd col) */
     [data-testid="stDataEditor"] [data-testid="glide-cell"] {
@@ -223,6 +223,10 @@ st.markdown("""<style>
     }
     [data-testid="stDataEditor"] [data-testid="glide-cell"]:nth-child(2) {
         text-align: left;
+    }
+    /* Compact caption */
+    .main .block-container [data-testid="stCaptionContainer"] {
+        margin-bottom: -0.5rem;
     }
 </style>""", unsafe_allow_html=True)
 
