@@ -1,0 +1,6 @@
+.streamlit/secrets.toml
+__pycache__/
+*.pyc
+build_html.py
+bioassay_browser.html
+save_edits.py
