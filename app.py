@@ -2,7 +2,6 @@
 """
 Interactive Bioassay Browser & Curation App
 Streamlit app for filtering, visualising, and curating PubChem bioassay data.
-Table-first layout with charts on a separate page.
 """
 
 import re
@@ -108,11 +107,10 @@ def col_options(col):
 with st.sidebar:
     st.header("Filters")
 
-    # AID filter (supports comma-separated, newline-separated, or single AID)
-    aid_input = st.text_area(
+    # AID filter (supports comma-separated or space-separated AIDs)
+    aid_input = st.text_input(
         "Filter by AID(s)",
-        placeholder="Paste AIDs here…\ne.g. 1, 3, 5 or one per line",
-        height=80,
+        placeholder="e.g. 1, 3, 5",
         key="aid_input",
     )
 
@@ -183,15 +181,27 @@ def apply_filters(df):
 
 filtered = apply_filters(df_master)
 
-# Store filtered data in session state so Charts page can access it
-st.session_state.filtered = filtered
 
-# ── Custom CSS for larger fonts ───────────────────────────────────────────────
+# ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""<style>
-    .main .block-container { font-size: 16px; }
-    [data-testid="stSidebar"] { font-size: 14px; }
-    h1 { font-size: 2rem !important; }
-    h3 { font-size: 1.2rem !important; }
+    .main .block-container {
+        font-size: 16px;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    [data-testid="stSidebar"] {
+        font-size: 14px;
+        width: 260px !important;
+        min-width: 260px !important;
+    }
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 1rem;
+    }
+    [data-testid="stSidebar"] [data-testid="stMultiSelect"] {
+        margin-bottom: -0.5rem;
+    }
+    h1 { font-size: 1.6rem !important; margin-bottom: 0 !important; }
+    h3 { font-size: 1.1rem !important; }
 </style>""", unsafe_allow_html=True)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
@@ -232,7 +242,7 @@ edited = st.data_editor(
     column_config=column_config,
     use_container_width=True,
     num_rows="fixed",
-    height=800,
+    height=1000,
     key="data_editor",
 )
 
@@ -259,40 +269,37 @@ if edited is not None:
                         df_master.at[mi, col] = row[col]
                         st.session_state.edit_count += 1
 
-# ── Save & Export (compact) ───────────────────────────────────────────────────
+# ── Download ──────────────────────────────────────────────────────────────────
 st.divider()
-save_col, spacer, export_col = st.columns([2, 0.5, 3])
 
-with save_col:
-    if st.button("Save all changes to Excel", type="primary", use_container_width=True):
-        try:
-            df_master.to_excel(EXCEL_PATH, index=False, engine="openpyxl")
-            st.session_state.edit_count = 0
-            st.success(f"Saved {len(df_master)} rows.")
-        except PermissionError:
-            st.error("Cannot save — close the Excel file first.")
-
-with export_col:
-    fn_col, dl_col = st.columns([2, 2])
-    with fn_col:
-        filename = st.text_input(
-            "Filename",
-            value="filtered_bioassay_data",
-            key="export_filename",
-            label_visibility="collapsed",
-            placeholder="Export filename...",
-        )
-    with dl_col:
-        buffer = BytesIO()
-        filtered.to_excel(buffer, index=False, engine="openpyxl")
-        buffer.seek(0)
-        safe_name = "".join(c for c in filename if c.isalnum() or c in "-_ ").strip()
-        if not safe_name:
-            safe_name = "filtered_bioassay_data"
+@st.dialog("Download filtered data")
+def download_dialog():
+    filename = st.text_input("File name", value="filtered_bioassay_data")
+    fmt = st.radio("Format", ["Excel (.xlsx)", "CSV (.csv)"], horizontal=True)
+    safe_name = "".join(c for c in filename if c.isalnum() or c in "-_ ").strip()
+    if not safe_name:
+        safe_name = "filtered_bioassay_data"
+    buf = BytesIO()
+    if fmt == "CSV (.csv)":
+        buf.write(filtered.to_csv(index=False).encode("utf-8"))
+        buf.seek(0)
         st.download_button(
-            label=f"Download {len(filtered)} rows (.xlsx)",
-            data=buffer,
+            label=f"Download {len(filtered)} rows as CSV",
+            data=buf,
+            file_name=f"{safe_name}.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+    else:
+        filtered.to_excel(buf, index=False, engine="openpyxl")
+        buf.seek(0)
+        st.download_button(
+            label=f"Download {len(filtered)} rows as Excel",
+            data=buf,
             file_name=f"{safe_name}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True,
         )
+
+if st.button(f"Download {len(filtered)} rows", type="primary"):
+    download_dialog()
