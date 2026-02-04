@@ -217,13 +217,6 @@ st.markdown("""<style>
     }
     h1 { font-size: 1.8rem !important; margin-bottom: -0.5rem !important; }
     h3 { font-size: 1.2rem !important; }
-    /* Centre all data-editor columns except Study Goal (2nd col) */
-    [data-testid="stDataEditor"] [data-testid="glide-cell"] {
-        text-align: center;
-    }
-    [data-testid="stDataEditor"] [data-testid="glide-cell"]:nth-child(2) {
-        text-align: left;
-    }
 </style>""", unsafe_allow_html=True)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
