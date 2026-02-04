@@ -12,7 +12,7 @@ from io import BytesIO
 from pathlib import Path
 
 # ── Config ────────────────────────────────────────────────────────────────────
-EXCEL_PATH = Path(__file__).parent / "PubChem_AID_description_readable_BL_Revised_V11.xlsx"
+EXCEL_PATH = Path(__file__).parent / "PubChem_600Bioassays_Curated.xlsx"
 
 st.set_page_config(
     page_title="Bioassay Browser",
