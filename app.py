@@ -224,17 +224,12 @@ st.markdown("""<style>
     [data-testid="stDataEditor"] [data-testid="glide-cell"]:nth-child(2) {
         text-align: left;
     }
-    /* Compact caption */
-    .main .block-container [data-testid="stCaptionContainer"] {
-        margin-bottom: -0.5rem;
-    }
 </style>""", unsafe_allow_html=True)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
 st.title("Bioassay Browser & Curation Tool")
-st.caption(
-    f"Showing **{len(filtered)}** of **{len(df_master)}** assays "
-    f"| {st.session_state.edit_count} unsaved edit(s)"
+st.markdown(
+    f"Showing **{len(filtered)}** of **{len(df_master)}** assays"
 )
 
 # ── Editable data table ──────────────────────────────────────────────────────
