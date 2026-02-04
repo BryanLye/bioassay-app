@@ -217,6 +217,8 @@ st.markdown("""<style>
     }
     h1 { font-size: 1.8rem !important; margin-bottom: -0.5rem !important; }
     h3 { font-size: 1.2rem !important; }
+    /* Hide anchor link icons on headings */
+    h1 a, h2 a, h3 a { display: none !important; }
 </style>""", unsafe_allow_html=True)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
