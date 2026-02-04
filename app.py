@@ -203,8 +203,7 @@ st.markdown("""<style>
         padding-bottom: 1rem;
     }
     [data-testid="stSidebar"] {
-        width: 260px !important;
-        min-width: 260px !important;
+        min-width: 200px;
     }
     [data-testid="stSidebar"] > div:first-child {
         padding-top: 3.2rem;
