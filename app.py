@@ -116,6 +116,23 @@ def title_case(s: str) -> str:
     return " ".join(result)
 
 
+# ── Handle reset (must happen before widgets render) ─────────────────────────
+if st.session_state.get("_do_reset"):
+    st.session_state._do_reset = False
+    st.cache_data.clear()
+    # Clear all filter widget keys so they re-render with defaults
+    for key in ["aid_input", "search_text"]:
+        if key in st.session_state:
+            del st.session_state[key]
+    for col in FILTER_COLS:
+        k = f"filter_{col}"
+        if k in st.session_state:
+            del st.session_state[k]
+    # Revert data
+    st.session_state.df = load_excel().copy()
+    st.session_state.edit_count = 0
+    df_master = st.session_state.df
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.header("Filters")
@@ -145,20 +162,9 @@ with st.sidebar:
 
     st.divider()
 
-    # Single reset button — clears filters and reverts edits
+    # Reset button — sets flag and reruns so keys are cleared before widgets render
     if st.button("Reset All", use_container_width=True):
-        st.cache_data.clear()
-        # Clear filter widget keys
-        for key in ["aid_input", "search_text"]:
-            if key in st.session_state:
-                del st.session_state[key]
-        for col in FILTER_COLS:
-            k = f"filter_{col}"
-            if k in st.session_state:
-                del st.session_state[k]
-        # Revert data
-        st.session_state.df = load_excel().copy()
-        st.session_state.edit_count = 0
+        st.session_state._do_reset = True
         st.rerun()
 
 
