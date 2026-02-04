@@ -125,7 +125,7 @@ with st.sidebar:
     filter_selections = {}
     for col in FILTER_COLS:
         options = col_options(col)
-        label = col.replace("_", " ")
+        label = title_case(col)
         filter_selections[col] = st.multiselect(
             label, options=options, default=[], key=f"filter_{col}"
         )
@@ -182,15 +182,27 @@ def apply_filters(df):
 filtered = apply_filters(df_master)
 
 
+# ── Title-case helper ─────────────────────────────────────────────────────────
+_FILLER = {"or", "and", "of", "the", "in", "a", "an", "to", "for", "by", "on", "at", "is"}
+
+def title_case(s: str) -> str:
+    """Title-case a string, keeping filler words lowercase (except first word)."""
+    words = s.replace("_", " ").split()
+    result = []
+    for i, w in enumerate(words):
+        if i == 0 or w.lower() not in _FILLER:
+            result.append(w.capitalize())
+        else:
+            result.append(w.lower())
+    return " ".join(result)
+
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""<style>
     .main .block-container {
-        font-size: 16px;
-        padding-top: 1rem;
+        padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
     [data-testid="stSidebar"] {
-        font-size: 14px;
         width: 260px !important;
         min-width: 260px !important;
     }
@@ -200,8 +212,19 @@ st.markdown("""<style>
     [data-testid="stSidebar"] [data-testid="stMultiSelect"] {
         margin-bottom: -0.5rem;
     }
-    h1 { font-size: 1.6rem !important; margin-bottom: 0 !important; }
-    h3 { font-size: 1.1rem !important; }
+    /* Bigger fonts */
+    .main .block-container, [data-testid="stSidebar"] {
+        font-size: 16px;
+    }
+    h1 { font-size: 1.8rem !important; margin-bottom: 0 !important; }
+    h3 { font-size: 1.2rem !important; }
+    /* Centre all data-editor columns except Study Goal (2nd col) */
+    [data-testid="stDataEditor"] [data-testid="glide-cell"] {
+        text-align: center;
+    }
+    [data-testid="stDataEditor"] [data-testid="glide-cell"]:nth-child(2) {
+        text-align: left;
+    }
 </style>""", unsafe_allow_html=True)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
@@ -212,8 +235,6 @@ st.caption(
 )
 
 # ── Editable data table ──────────────────────────────────────────────────────
-st.subheader("Data Table")
-
 # Build column config
 column_config = {
     "AID": st.column_config.NumberColumn("AID", disabled=True, format="%d"),
@@ -222,14 +243,14 @@ column_config = {
 for col in CONSTRAINED_COLS:
     options = col_options(col)
     column_config[col] = st.column_config.SelectboxColumn(
-        col.replace("_", " "),
+        title_case(col),
         options=options,
         required=False,
     )
 
 for col in TEXT_COLS:
     column_config[col] = st.column_config.TextColumn(
-        col.replace("_", " "),
+        title_case(col),
         width="large" if col == "Study_Goal" else "medium",
     )
 
