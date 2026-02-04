@@ -118,20 +118,13 @@ def title_case(s: str) -> str:
 
 # ── Handle reset (must happen before widgets render) ─────────────────────────
 if st.session_state.get("_do_reset"):
-    st.session_state._do_reset = False
+    # Preserve only auth state, wipe everything else
+    auth = st.session_state.get("authenticated", False)
     st.cache_data.clear()
-    # Clear all filter widget keys so they re-render with defaults
-    for key in ["aid_input", "search_text"]:
-        if key in st.session_state:
-            del st.session_state[key]
-    for col in FILTER_COLS:
-        k = f"filter_{col}"
-        if k in st.session_state:
-            del st.session_state[k]
-    # Revert data
-    st.session_state.df = load_excel().copy()
-    st.session_state.edit_count = 0
-    df_master = st.session_state.df
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.session_state.authenticated = auth
+    st.rerun()
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
