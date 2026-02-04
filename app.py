@@ -96,11 +96,24 @@ init_state()
 df_master = st.session_state.df  # mutable reference
 
 
-# ── Helper: unique sorted options for a column ────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def col_options(col):
     vals = df_master[col].dropna().unique().tolist()
     vals = [v for v in vals if v != ""]
     return sorted(vals, key=str)
+
+_FILLER = {"or", "and", "of", "the", "in", "a", "an", "to", "for", "by", "on", "at", "is"}
+
+def title_case(s: str) -> str:
+    """Title-case a string, keeping filler words lowercase (except first word)."""
+    words = s.replace("_", " ").split()
+    result = []
+    for i, w in enumerate(words):
+        if i == 0 or w.lower() not in _FILLER:
+            result.append(w.capitalize())
+        else:
+            result.append(w.lower())
+    return " ".join(result)
 
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -181,20 +194,6 @@ def apply_filters(df):
 
 filtered = apply_filters(df_master)
 
-
-# ── Title-case helper ─────────────────────────────────────────────────────────
-_FILLER = {"or", "and", "of", "the", "in", "a", "an", "to", "for", "by", "on", "at", "is"}
-
-def title_case(s: str) -> str:
-    """Title-case a string, keeping filler words lowercase (except first word)."""
-    words = s.replace("_", " ").split()
-    result = []
-    for i, w in enumerate(words):
-        if i == 0 or w.lower() not in _FILLER:
-            result.append(w.capitalize())
-        else:
-            result.append(w.lower())
-    return " ".join(result)
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""<style>
